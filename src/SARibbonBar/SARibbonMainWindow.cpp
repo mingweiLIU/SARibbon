@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <QHash>
 #include <QFile>
-
+#include "SARibbonElementManager.h"
 /**
  * @brief The SARibbonMainWindowPrivate class
  */
@@ -44,10 +44,10 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon)
 {
     m_d->init();
     m_d->useRibbon = useRibbon;
-    qDebug() << windowFlags();
     if (useRibbon) {
         setRibbonTheme(ribbonTheme());
         setMenuWidget(new SARibbonBar(this));
+        qDebug() << RibbonSubElementStyleOpt;
 #ifdef Q_OS_UNIX
         //某些系统会对FramelessWindowHint异常
         // FramelessHelper用如下这种setWindowFlags(w->windowFlags()|Qt::FramelessWindowHint);方式设置，改为强制取消其他
@@ -148,7 +148,7 @@ void SARibbonMainWindow::setMenuWidget(QWidget* menubar)
         if (nullptr == m_d->windowButtonGroup) {
             m_d->windowButtonGroup = new SAWindowButtonGroup(this);
         }
-        QSize s = m_d->windowButtonGroup->size();
+        QSize s = m_d->windowButtonGroup->sizeHint();
         s.setHeight(m_d->ribbonBar->titleBarHeight());
         m_d->windowButtonGroup->setFixedSize(s);
         m_d->windowButtonGroup->setWindowStates(windowState());
@@ -184,7 +184,7 @@ void SARibbonMainWindow::setMenuBar(QMenuBar* menuBar)
         if (nullptr == m_d->windowButtonGroup) {
             m_d->windowButtonGroup = new SAWindowButtonGroup(this);
         }
-        QSize s = m_d->windowButtonGroup->size();
+        QSize s = m_d->windowButtonGroup->sizeHint();
         s.setHeight(m_d->ribbonBar->titleBarHeight());
         m_d->windowButtonGroup->setFixedSize(s);
         m_d->windowButtonGroup->setWindowStates(windowState());

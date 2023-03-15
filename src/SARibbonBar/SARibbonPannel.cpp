@@ -49,7 +49,10 @@ public:
     SARibbonPannelOptionButton* m_optionActionButton;     ///< 标题栏的y距离
     SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;  ///< pannel的布局模式，默认为3行模式ThreeRowMode
     bool m_isCanCustomize;                                ///< 记录是否可自定义
+    static int s_pannelTitleHeight;                       ///< pannel标题栏的全局高度,默认为21
 };
+
+int SARibbonPannelPrivate::s_pannelTitleHeight = 21;
 
 SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel* p)
     : Parent(p)
@@ -120,6 +123,9 @@ SARibbonPannel::~SARibbonPannel()
  */
 void SARibbonPannel::setActionRowProportionProperty(QAction* action, SARibbonPannelItem::RowProportion rp)
 {
+    if (action == nullptr) {
+        return;
+    }
     action->setProperty(SARibbonPannelItemRowProportionPropertyName, int(rp));
 }
 
@@ -146,6 +152,9 @@ SARibbonPannelItem::RowProportion SARibbonPannel::getActionRowProportionProperty
  */
 void SARibbonPannel::setActionRowProportion(QAction* action, SARibbonPannelItem::RowProportion rp)
 {
+    if (action == nullptr) {
+        return;
+    }
     SARibbonPannelLayout* lay = m_d->m_layout;
 
     setActionRowProportionProperty(action, rp);
@@ -166,6 +175,9 @@ void SARibbonPannel::setActionRowProportion(QAction* action, SARibbonPannelItem:
  */
 SARibbonToolButton* SARibbonPannel::addAction(QAction* action, SARibbonPannelItem::RowProportion rp)
 {
+    if (action == nullptr) {
+        return nullptr;
+    }
     setActionRowProportionProperty(action, rp);
     addAction(action);
 
@@ -213,6 +225,9 @@ SARibbonToolButton* SARibbonPannel::addSmallAction(QAction* action)
  */
 void SARibbonPannel::addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp)
 {
+    if (act == nullptr) {
+        return;
+    }
     setActionRowProportionProperty(act, rp);
     addAction(act);
     SARibbonToolButton* btn = m_d->lastAddActionButton();
@@ -252,6 +267,9 @@ QAction* SARibbonPannel::addAction(const QString& text, const QIcon& icon, QTool
  */
 SARibbonToolButton* SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode)
 {
+    if (menu == nullptr) {
+        return nullptr;
+    }
     QAction* action = menu->menuAction();
 
     addAction(action, rp);
@@ -270,9 +288,10 @@ SARibbonToolButton* SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::Row
  */
 SARibbonToolButton* SARibbonPannel::addActionMenu(QAction* action, QMenu* menu, SARibbonPannelItem::RowProportion rp)
 {
-    addAction(action, rp);
-    SARibbonToolButton* btn = m_d->lastAddActionButton();
-
+    SARibbonToolButton* btn = addAction(action, rp);
+    if (nullptr == btn) {
+        return nullptr;
+    }
     btn->setMenu(menu);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
     return (btn);
@@ -554,7 +573,7 @@ bool SARibbonPannel::isExpanding() const
  */
 int SARibbonPannel::titleHeight() const
 {
-    return (isTwoRow() ? 0 : RibbonSubElementStyleOpt.pannelTitleHeight);
+    return (isTwoRow() ? 0 : pannelTitleHeight());
 }
 
 /**
@@ -619,6 +638,37 @@ void SARibbonPannel::setPannelName(const QString& title)
 {
     setWindowTitle(title);
     update();
+}
+
+/**
+ * @brief 获取大图标的高度
+ * @return
+ */
+int SARibbonPannel::largeHeight() const
+{
+    return SARibbonPannelLayout::calcLargeHeight(rect(), this);
+}
+
+/**
+ * @brief 定义所有的pannel的标题栏高度，有别于@sa titleHeight 此函数是静态函数，获取的是全局的高度
+ * 而 @sa titleHeight 函数会根据当前的行情况返回标题栏高度，在2行情况下返回0
+ *
+ * @return
+ */
+int SARibbonPannel::pannelTitleHeight()
+{
+    return SARibbonPannelPrivate::s_pannelTitleHeight;
+}
+
+/**
+ * @brief 设置pannel的全局高度，此函数是个全局的影响
+ * @note SARibbonStyleOption会用到此函数，调用设置函数后需要手动重新计算SARibbonStyleOption的内容,@sa SARibbonStyleOption::recalc
+ * @sa SARibbonStyleOption
+ * @param h
+ */
+void SARibbonPannel::setPannelTitleHeight(int h)
+{
+    SARibbonPannelPrivate::s_pannelTitleHeight = h;
 }
 
 void SARibbonPannel::resetLayout(PannelLayoutMode newmode)

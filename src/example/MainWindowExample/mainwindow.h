@@ -8,6 +8,7 @@ class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
 class QTextEdit;
+
 class MainWindow : public SARibbonMainWindow
 {
     Q_OBJECT
@@ -45,7 +46,11 @@ private slots:
     void onActionLoadCustomizeXmlFileTriggered();
     void onActionWindowFlagNormalButtonTriggered(bool b);
 
-    void onFontComWidgetCurrentFontChanged(const QFont& font);
+    void onFontComWidgetCurrentFontChanged(const QFont& f);
+    void onActionFontLargerTriggered();
+    void onActionFontSmallerTriggered();
+    void onActionwordWrapIn2rowTriggered(bool b);
+    void onButtonGroupActionTriggered(QAction* act);
 
 private:
     SARibbonContextCategory* m_contextCategory;
